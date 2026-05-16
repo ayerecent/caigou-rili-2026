@@ -326,6 +326,7 @@ header p{opacity:.9;font-size:14px;}
         <span class="chip active" data-filter="type" data-value="省招物资" onclick="toggleFilter(this)">省招物资</span>
         <span class="chip active" data-filter="type" data-value="省招服务" onclick="toggleFilter(this)">省招服务</span>
         <span class="chip active" data-filter="type" data-value="固定授权" onclick="toggleFilter(this)">固定授权</span>
+        <span class="chip active" data-filter="type" data-value="国招" onclick="toggleFilter(this)">国招</span>
         <span class="chip active" data-filter="type" data-value="自定义" onclick="toggleFilter(this)">自定义</span>
       </div>
       <div class="filter-group" id="phaseFilterGroup">
@@ -17263,7 +17264,11 @@ function renderCalendar(){
     dayEvents=dayEvents.concat(userEvents.filter(e=>e.date===dateStr));
     // 筛选
     dayEvents=dayEvents.filter(e=>{
-      if(!filters.types.includes(e.type)) return false;
+      const typeMatch = filters.types.some(t=>{
+        if(t==='国招') return e.type.startsWith('国招');
+        return e.type === t;
+      });
+      if(!typeMatch) return false;
       const phaseMatch=filters.phases.some(p=>{
         if(p==='其他') return e.phase==='其他';
         if(p==='截止') return e.phase.includes('截止');
@@ -17761,7 +17766,7 @@ function onPhaseChange(){
 function buildFilterChips(){
   const typeGroup = document.getElementById('typeFilterGroup');
   if(!typeGroup) return;
-  const builtinTypeValues = ['省招物资','省招服务','固定授权','自定义'];
+  const builtinTypeValues = ['省招物资','省招服务','固定授权','国招','自定义'];
   const existingType = typeGroup.querySelectorAll('.chip[data-filter="type"]');
   [...existingType].forEach(chip=>{
     if(!builtinTypeValues.includes(chip.dataset.value)) chip.remove();
